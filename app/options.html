@@ -1,0 +1,96 @@
+<!doctype html>
+<html ng-app="options">
+  <head>
+    <title>Moly Keys</title>
+    <link href="styles/options.css" rel="stylesheet">
+    <!-- build:js scripts/options.js -->
+    <script src="bower_components/jquery/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/sass-bootstrap/js/button.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="scripts/libs/hapt.js"></script>
+    <script src="scripts/options.js"></script>
+    <!-- endbuild -->
+  </head>
+  <body>
+    <!-- CHROME EXTENSION OPTION -->
+    <div class="container">
+      <div class="page-header">
+        <h1><small>Moly</small>Keys</h1>
+      </div>
+    </div>
+
+    <div class="container" ng-view></div>
+  </body>
+
+  <script type="text/ng-template" id="settingsView.html">
+    <settings></settings>
+  </script>
+
+  <script type="text/ng-template" id="settings.html">
+    <div>
+      <configs></configs>
+      <bindings></bindings>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="configs.html">
+    <div>
+      <h3>Configuration</h3>
+      <table class="table">
+        <tr ng-repeat="config in configs" class="row">
+          <td class="col-lg-3">
+            {{config.description}}
+          </td>
+          <td>
+            <div class="col-lg-6">
+                <input class="form-control" type="text" ng-model="config.val" ng-show="config.isText"/>
+                <select class="form-control" ng-model="config.val" ng-options="val as val for val in config.candidates" ng-show="config.isSelect" ng-change="updateSettings()"></select>
+                <input type="checkbox" ng-model="config.val" ng-show="config.isCheckbox"/>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="bindings.html">
+    <div>
+      <h3>Bindings</h3>
+      <table class="table">
+        <tr ng-repeat="binding in bindings" class="row">
+          <td class="col-lg-3">
+            {{binding.description}}
+          </td>
+          <td>
+            <span ng-repeat="shortcut in binding.val">
+              <div class="col-lg-3">
+                  <button class="btn btn-default col-lg-12"
+                          ng-class="{'editing': (editing && editing.binding.name == binding.name && editing.index == $index),
+                                    'disabled': (editing && editing.binding.name == binding.name && editing.index == $index),
+                                    'btn-info': (editing && editing.binding.name == binding.name && editing.index == $index)}"
+                          ng-click="clickShortcut($event, $parent.$index, $index)">
+                    {{shortcut.length == 0 ? '&nbsp;' : shortcut.join(' ')}}
+                  </button>
+              </div>
+              <div class="col-lg-1"
+                   ng-show="editing && editing.binding.name == binding.name && editing.index == $index">
+                  <button class="btn btn-info col-lg-12"
+                          ng-click="clickRemove($event, $parent.$index, $index)">
+                    <span class="glyphicon glyphicon-remove glyphicon-white"></span>
+                  </button>
+              </div>
+            </span>
+            <div class="col-lg-1">
+                <button class="btn btn-default col-lg-12" ng-click="clickAddition($event, $index)">
+                  <span class="glyphicon glyphicon-plus-sign"></span>
+                </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </script>
+
+</html>
