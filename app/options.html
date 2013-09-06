@@ -24,11 +24,9 @@
     <div class="container" ng-view></div>
   </body>
 
-  <script type="text/ng-template" id="settingsView.html">
-    <settings></settings>
-  </script>
 
   <script type="text/ng-template" id="settings.html">
+    <p class="text-right"><a ng-click="updateSettings()" href="#/raw">switch to Raw Settings</a></p>
     <div>
       <configs></configs>
       <bindings></bindings>
@@ -90,6 +88,21 @@
           </td>
         </tr>
       </table>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="raw.html">
+    <p class="text-right"><a href="#/settings">switch to Standard Settings</a></p>
+    <br>
+    <div>
+      <textarea class="form-control" rows="20" ng-model="serializedSettings"></textarea>
+      <br>
+      <div class="row">
+        <div class="col-lg-10"><p class="text-right" ng-class="textEmphasis">{{textMessage}}</p></div>
+        <div class="col-lg-2">
+          <button class="btn btn-default col-lg-12" ng-click="save()">OK</button>
+        <div>
+      </div>
     </div>
   </script>
 

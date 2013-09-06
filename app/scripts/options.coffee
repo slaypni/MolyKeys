@@ -6,14 +6,14 @@ CONFIG_DESCRIPTIONS = [
 BINDING_DESCRIPTIONS = [
     {name: 'scrollUp', description: 'Scroll Up'}
     {name: 'scrollDown', description: 'Scroll Down'}
-    {name: 'scrollTop', description: 'Scroll Top'}
-    {name: 'scrollBottom', description: 'Scroll Bottom'}
     {name: 'scrollLeft', description: 'Scroll Left'}
     {name: 'scrollRight', description: 'Scroll Right'}
     {name: 'pageUp', description: 'Page Up'}
     {name: 'pageDown', description: 'Page Down'}
-    {name: 'blur', description: 'Focus Out'}
+    {name: 'scrollTop', description: 'Scroll Top'}
+    {name: 'scrollBottom', description: 'Scroll Bottom'}
     {name: 'focusOnEditable', description: 'Focus On Editables'}
+    {name: 'blur', description: 'Focus Out'}
     {name: 'historyBack', description: 'History Back'}
     {name: 'historyForward', description: 'History Forward'}
     {name: 'gotoParentDirectory', description: 'Goto Parent Directory'}
@@ -25,69 +25,68 @@ MODIFIERS = ['Shift', 'Ctrl', 'Alt', 'Command', 'Meta']
 
 app = angular.module('options', ['ngRoute']).
     config ($routeProvider) ->
-        $routeProvider.when '/',
+        $routeProvider
+        .when '/',
             redirectTo: '/settings'
-        $routeProvider.when '/settings',
-            templateUrl: 'settingsView.html'
+        .when '/settings',
+            templateUrl: 'settings.html'
+            controller: 'settingsCtrl'
+        .when '/raw',
+            templateUrl: 'raw.html'
+            controller: 'rawCtrl'
 
-app.directive 'settings', ->
-    restrict: 'E'
-    transclude: false
-    scope: {}
-    templateUrl: 'settings.html'
-    replace: false
-    controller: ($scope) ->
-        loadSettings = (settings) ->
-            convertIntoArray = (options, descriptions) ->
-                for description in descriptions
-                    description: description.description
-                    name: description.name
-                    val: _.clone(options[description.name])
-                    candidates: description.candidates
-                    isText: not (description.candidates? or (typeof options[description.name] == 'boolean'))
-                    isSelect: description.candidates?
-                    isCheckbox: typeof options[description.name] == 'boolean'
+app.controller 'settingsCtrl', ($scope) ->
+    loadSettings = (settings) ->
+        convertIntoArray = (options, descriptions) ->
+            for description in descriptions
+                description: description.description
+                name: description.name
+                val: _.clone(options[description.name])
+                candidates: description.candidates
+                isText: not (description.candidates? or (typeof options[description.name] == 'boolean'))
+                isSelect: description.candidates?
+                isCheckbox: typeof options[description.name] == 'boolean'
 
-            $scope.$apply ->
-                $scope.settings = settings
-                $scope.configs = convertIntoArray(_.omit(settings, 'bindings'), CONFIG_DESCRIPTIONS)
-                $scope.bindings = convertIntoArray(settings['bindings'], BINDING_DESCRIPTIONS)
+        $scope.$apply ->
+            $scope.settings = settings
+            $scope.configs = convertIntoArray(_.omit(settings, 'bindings'), CONFIG_DESCRIPTIONS)
+            $scope.bindings = convertIntoArray(settings['bindings'], BINDING_DESCRIPTIONS)
 
-        chrome.runtime.sendMessage({type: 'getSettings'}, loadSettings)
+    chrome.runtime.sendMessage({type: 'getSettings'}, loadSettings)
 
-        onLeaveTab = (cb) ->
-            chrome.tabs.getCurrent (tab) ->
-                prev_tab_id = null
-                chrome.tabs.onActivated.addListener (activeInfo) ->
-                    if not prev_tab_id? or prev_tab_id == tab.id
-                        cb()
-                    prev_tab_id = activeInfo.tabId
+    onLeaveTab = (cb) ->
+        chrome.tabs.getCurrent (tab) ->
+            prev_tab_id = null
+            chrome.tabs.onActivated.addListener (activeInfo) ->
+                if not prev_tab_id? or prev_tab_id == tab.id
+                    cb()
+                prev_tab_id = activeInfo.tabId
 
-        onRemoveTab = (cb) ->
-            window.addEventListener 'beforeunload', ->
-                cb()
-                return
+    onRemoveTab = (cb) ->
+        window.addEventListener 'beforeunload', ->
+            cb()
+            return
 
-        leaveTabHandler = ->
-            $scope.$broadcast('leaveTab')
-                
-            $scope.updateSettings()
+    leaveTabHandler = ->
+        $scope.$broadcast('leaveTab')
+            
+        $scope.updateSettings()
 
-        $scope.updateSettings = ->
-            if not $scope.hasOwnProperty('settings') then return
+    $scope.updateSettings = ->
+        if not $scope.hasOwnProperty('settings') then return
 
-            convertIntoObject = (options) ->
-                obj = {}
-                for option in options
-                    obj[option.name] = option.val
-                return obj
+        convertIntoObject = (options) ->
+            obj = {}
+            for option in options
+                obj[option.name] = option.val
+            return obj
 
-            settings = _.extend(convertIntoObject($scope.configs), {bindings: convertIntoObject($scope.bindings)})
-            if not _.isEqual($scope.settings, settings)
-                chrome.runtime.sendMessage({type: 'setSettings', settings: settings}, loadSettings)
-                
-        onLeaveTab(leaveTabHandler)
-        onRemoveTab(leaveTabHandler)
+        settings = _.extend(convertIntoObject($scope.configs), {bindings: convertIntoObject($scope.bindings)})
+        if not _.isEqual($scope.settings, settings)
+            chrome.runtime.sendMessage({type: 'setSettings', settings: settings}, loadSettings)
+            
+    onLeaveTab(leaveTabHandler)
+    onRemoveTab(leaveTabHandler)
 
 app.directive 'configs', ->
     restrict: 'E'
@@ -152,3 +151,24 @@ app.directive 'bindings', ->
             listen()
             return false
         
+app.controller 'rawCtrl', ($scope) ->
+    loadSettings = ->
+        chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
+            $scope.$apply ->
+                $scope.settings = settings
+                $scope.serializedSettings = JSON.stringify settings, null, 2
+    loadSettings()
+    $scope.textEmphasis = 'text-warning'
+    $scope.textMessage = 'CAUTION: This extension will not work properly if invalid data was input.'
+
+    $scope.save = ->
+        try
+            settings = JSON.parse $scope.serializedSettings
+        catch error
+            $scope.textEmphasis = 'text-danger'
+            $scope.textMessage = 'ERROR: SyntaxError'
+            return
+        chrome.runtime.sendMessage {type: 'setSettings', settings: settings}, ->
+            $scope.$apply ->
+                $scope.textEmphasis = 'text-success'
+                $scope.textMessage = 'SUCCESS'
