@@ -46,12 +46,14 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
                     _scroll = null
                     teardown = null
                 document.activeElement.addEventListener 'scroll', teardown
+                document.activeElement.dispatchEvent e
+
                 window.setTimeout =>
                     _scroll?()
                     teardown?()
                 , 0
                     
-                document.activeElement.dispatchEvent e    
+
 
             isVisible = (e) =>
                 return (e.offsetWidth > 0 or e.offsetHeight > 0) and window.getComputedStyle(e).visibility != 'hidden'
