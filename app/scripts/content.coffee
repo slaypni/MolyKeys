@@ -52,8 +52,6 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
                     _scroll?()
                     teardown?()
                 , 0
-                    
-
 
             isVisible = (e) =>
                 return (e.offsetWidth > 0 or e.offsetHeight > 0) and window.getComputedStyle(e).visibility != 'hidden'
@@ -87,7 +85,7 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
                 
             focusOnEditable: (offset = 1) =>
                 inputQueries = ('input[type="' + type + '"]' for type in ['text', 'password', 'email', 'url', 'search', 'telephone', 'number', 'datetime'])
-                query = inputQueries.join(',') + ', textarea, [contenteditable]:not([contenteditable="false"])'
+                query = inputQueries.join(',') + ', input:not([type]), textarea, [contenteditable]:not([contenteditable="false"])'
                 editables = _.filter document.querySelectorAll(query), isVisible
                 if editables.length > 0
                     offset = offset % editables.length
