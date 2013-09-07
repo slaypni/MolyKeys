@@ -12,7 +12,8 @@ BINDING_DESCRIPTIONS = [
     {name: 'pageDown', description: 'Page Down'}
     {name: 'scrollTop', description: 'Scroll Top'}
     {name: 'scrollBottom', description: 'Scroll Bottom'}
-    {name: 'focusOnEditable', description: 'Focus On Editables'}
+    {name: 'focusOnEditable', description: 'Focus on Next Editables'}
+    {name: 'focusOnPreviousEditable', description: 'Focus on Previous Editables'}
     {name: 'blur', description: 'Focus Out'}
     {name: 'historyBack', description: 'History Back'}
     {name: 'historyForward', description: 'History Forward'}

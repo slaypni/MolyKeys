@@ -83,13 +83,19 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
             blur: =>
                 document.activeElement.blur()
                 
-            focusOnEditable: =>
+            focusOnEditable: (offset = 1) =>
                 inputQueries = ('input[type="' + type + '"]' for type in ['text', 'password', 'email', 'url', 'search', 'telephone', 'number', 'datetime'])
                 query = inputQueries.join(',') + ', textarea, [contenteditable]:not([contenteditable="false"])'
                 editables = _.filter document.querySelectorAll(query), isVisible
                 if editables.length > 0
-                    index = (_.indexOf(editables, document.activeElement) + 1) % editables.length
+                    offset = offset % editables.length
+                    index = _.indexOf(editables, document.activeElement)
+                    index = if index == -1 then -offset else index
+                    index = (index + editables.length + offset) % editables.length
                     editables[index].focus()
+
+            focusOnPreviousEditable: =>
+                @focusOnEditable -1
 
             historyBack: =>
                 window.history.back()
