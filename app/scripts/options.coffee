@@ -17,9 +17,12 @@ BINDING_DESCRIPTIONS = [
     {name: 'blur', description: 'Focus Out'}
     {name: 'historyBack', description: 'History Back'}
     {name: 'historyForward', description: 'History Forward'}
+    {name: 'createTab', description: 'Open Tab'}
+    {name: 'removeTab', description: 'Close Tab'}
     {name: 'gotoParentDirectory', description: 'Goto Parent Directory'}
-    {name: 'mark', description: 'Attach Mark'}
-    {name: 'jumpToMark', description: 'Jump to Mark'}
+    {name: 'mark', description: 'Attach a Mark'}
+    {name: 'jumpToMark', description: 'Jump to Next Mark'}
+    {name: 'jumpToPreviousMark', description: 'Jump to Previous Mark'}
 ]
 
 MODIFIERS = ['Shift', 'Ctrl', 'Alt', 'Command', 'Meta']

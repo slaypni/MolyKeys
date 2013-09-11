@@ -13,6 +13,8 @@ chrome.runtime.onMessage.addListener (request, sender, sendResponse) ->
         when 'callWithCallback'
             fn = getFunction()
             fn.apply(this, request.args.concat(sendResponse))
+        when 'getTab'
+            sendResponse(sender.tab)
         when 'getSettings'
             storage.getSettings (settings) ->
                 sendResponse(settings)

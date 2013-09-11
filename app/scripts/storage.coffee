@@ -22,6 +22,9 @@ INITIAL_SETTINGS =
         gotoParentDirectory: []
         mark: ['textarea']
         jumpToMark: ['textarea']
+        jumpToPreviousMark: ['textarea']
+        createTab: []
+        removeTab: []
     bindings:
         scrollUp: [['Ctrl', 'P']]
         scrollDown: [['Ctrl', 'N']]
@@ -37,8 +40,11 @@ INITIAL_SETTINGS =
         historyBack: [['Ctrl', '/']]
         historyForward: [['Alt', '/']]
         gotoParentDirectory: [['Alt', 'Up']]
-        mark: [['Ctrl', 'M']]
-        jumpToMark: [['Ctrl', 'J']]
+        mark: []
+        jumpToMark: []
+        jumpToPreviousMark: []
+        createTab: []
+        removeTab: []
 
 EMPTY_SETTINGS =
     ( (items) ->

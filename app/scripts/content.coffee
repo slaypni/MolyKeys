@@ -1,6 +1,10 @@
 #require underscore.js hapt_mod.js
 
 chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
+    callbg = (cb, fnname, args...) ->
+        chrome.runtime.sendMessage {type: 'call', fnname: fnname, args: args}, (response) ->
+            cb? response
+
     haptListen = (cb) ->
         hapt_mod.listen cb, window, true, []
 
@@ -16,8 +20,7 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
         
         ret = true
 
-        for op, binds of settings.bindings
-            continue if not (binds.some (bind) -> _.isEqual keys, bind)
+        for op, binds of settings.bindings when (binds.some (bind) -> _.isEqual keys, bind)
             insensitive = settings.insensitives[op]
             continue if insensitive? and (document.activeElement.nodeName.toLowerCase() in insensitive) or (document.activeElement.isContentEditable and 'textarea' in insensitive)
             Operation.get()[op]()
@@ -109,7 +112,26 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
                 window.location = href.substring 0, i if i > 0 and href[i-1] != '/'
 
             mark: =>
-                @marked = {x: window.scrollX, y: window.scrollY}
+                @marked ?= []
+                @marked.push {x: window.scrollX, y: window.scrollY}
 
             jumpToMark: =>
-                window.scrollTo @marked.x, @marked.y if @marked?
+                return if not @marked?
+                p = @marked.shift()
+                if p?
+                    window.scrollTo p.x, p.y
+                    @marked.push p
+
+            jumpToPreviousMark: =>
+                return if not @marked?
+                p = @marked.pop()
+                if p?
+                    window.scrollTo p.x, p.y
+                    @marked.unshift p
+
+            removeTab: =>
+                chrome.runtime.sendMessage {type: 'getTab'}, (tab) ->
+                    callbg null, 'chrome.tabs.remove', tab.id
+
+            createTab: =>
+                callbg null, 'chrome.tabs.create', {}
