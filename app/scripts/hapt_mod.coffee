@@ -102,7 +102,13 @@ class _KeyState
             setModifiers()
             return true
 
-        switch event.type.toLowerCase()
+        event_type = event.type.toLowerCase()
+
+        # countermeasure to keyup ignoring during command keypress on osx
+        if @pressed_keys.hasOwnProperty('91') and keycode != '91' and event_type != 'keyup'
+            return false
+
+        switch event_type
             when 'keydown' then return down()
             when 'keyup' then return up()
 
@@ -110,8 +116,9 @@ class _KeyState
         describe = (code) =>
             return SHORTCUTS[code] ? String.fromCharCode(code)
 
-        modifier_keys = (describe(i) for i in MODIFIERS when @pressed_keys.hasOwnProperty(i))
-        regular_keys = (parseInt(i) for i, _e of @pressed_keys when parseInt(i) not in MODIFIERS).sort().map (i) -> describe(i)
+        pressed_keys = _.omit @pressed_keys, ['91']
+        modifier_keys = (describe(i) for i in MODIFIERS when pressed_keys.hasOwnProperty(i))
+        regular_keys = (parseInt(i) for i of pressed_keys when parseInt(i) not in MODIFIERS).sort().map (i) -> describe(i)
             
         return modifier_keys.concat(regular_keys)
 
