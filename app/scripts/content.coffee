@@ -12,7 +12,7 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
         return true if type != 'keydown'
 
         isEditable = (element) ->
-            return element.isContentEditable or element.nodeName.toLowerCase() in ['textarea', 'input', 'select']
+            return element? and (element.isContentEditable or element.nodeName.toLowerCase() in ['textarea', 'input', 'select'])
         isActiveElementEditable = isEditable(document.activeElement)
 
         # not to intercept inputs that do not include modifiers
