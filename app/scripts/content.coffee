@@ -39,22 +39,7 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
             constructor: ->
             
             scroll = (x, y) =>
-                e = document.createEvent 'WheelEvent'
-                e.initWebKitWheelEvent x, -y, window, 0, 0, 0, 0, false, false, false, false
-                
-                _scroll = =>
-                    window.scrollBy x, y
-                teardown = =>
-                    document.activeElement.removeEventListener 'scroll', arguments.callee
-                    _scroll = null
-                    teardown = null
-                document.activeElement.addEventListener 'scroll', teardown
-                document.activeElement.dispatchEvent e
-
-                window.setTimeout =>
-                    _scroll?()
-                    teardown?()
-                , 0
+                window.scrollBy x, y
 
             isVisible = (e) =>
                 return (e.offsetWidth > 0 or e.offsetHeight > 0) and window.getComputedStyle(e).visibility != 'hidden'
