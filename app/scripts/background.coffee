@@ -1,18 +1,12 @@
+import * as storage from './storage'
+
 chrome.runtime.onMessage.addListener (request, sender, sendResponse) ->
-    getFunction = ->
-        obj = window
-        for prop in request.fnname.split('.')
-            obj = obj[prop]
-        return obj
-        
     switch request.type
-        when 'call'
-            fn = getFunction()
-            response = fn.apply(this, request.args)
+        when 'removeTab'
+            chrome.tabs.remove(request.tabId)
+        when 'createTab'
+            response = chrome.tabs.create({})
             sendResponse(response)
-        when 'callWithCallback'
-            fn = getFunction()
-            fn.apply(this, request.args.concat(sendResponse))
         when 'getTab'
             sendResponse(sender.tab)
         when 'getSettings'

@@ -1,10 +1,7 @@
-#require underscore.js hapt_mod.js
+import _ from 'underscore'
+import * as hapt_mod from './hapt_mod'
 
 chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
-    callbg = (cb, fnname, args...) ->
-        chrome.runtime.sendMessage {type: 'call', fnname: fnname, args: args}, (response) ->
-            cb? response
-
     haptListen = (cb) ->
         hapt_mod.listen cb, window, true, []
 
@@ -116,7 +113,7 @@ chrome.runtime.sendMessage {type: 'getSettings'}, (settings) ->
 
             removeTab: =>
                 chrome.runtime.sendMessage {type: 'getTab'}, (tab) ->
-                    callbg null, 'chrome.tabs.remove', tab.id
+                    chrome.runtime.sendMessage {type: 'removeTab', tabId: tab.id}
 
             createTab: =>
-                callbg null, 'chrome.tabs.create', {}
+                chrome.runtime.sendMessage {type: 'createTab'}

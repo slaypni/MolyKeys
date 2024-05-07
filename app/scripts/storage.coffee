@@ -1,4 +1,4 @@
-# require underscore.js
+import _ from 'underscore'
 
 INITIAL_SETTINGS =
     interceptiveModifiers: ['Ctrl', 'Alt', 'Command', 'Meta']
@@ -126,8 +126,9 @@ setSettings = (settings, cb = null) ->
     chrome.storage.local.set _settings, ->
         cb?(_settings)
 
-@storage =
-    getSettings: getSettings
-    setSettings: setSettings
-    getSanitizedSettings: getSanitizedSettings
-    getSanitizedBindings: getSanitizedBindings
+export {
+    getSettings
+    setSettings
+    getSanitizedSettings
+    getSanitizedBindings
+}

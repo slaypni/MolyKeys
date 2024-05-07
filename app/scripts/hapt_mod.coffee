@@ -1,3 +1,5 @@
+import _ from 'underscore'
+
 MODIFIERS = [
     16,  # Shift
     17,  # Ctrl
@@ -194,6 +196,6 @@ listen = (cb, doc = window, useCapture = true, targets = ['body', 'html']) ->
         stop: stop
     }
     
-@hapt_mod = {
-    listen: listen
-}
+export {
+    listen
+}    
